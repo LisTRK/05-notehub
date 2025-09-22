@@ -1,7 +1,7 @@
 import css from './App.module.css'
 import { useState } from 'react'
 
-import {  fetchNotes } from '../../services/noteServices'
+import {  fetchNotes } from '../../services/noteService'
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import SearchBox from '../SearchBox/SearchBox';
 import NoteList from '../NoteList/NoteList';
