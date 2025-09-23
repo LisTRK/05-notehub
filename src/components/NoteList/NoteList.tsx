@@ -13,7 +13,9 @@ const NoteList = ({ notes }: NoteListProps) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: (noteId: string) => deleteNote(noteId),
-    onSuccess: () => {queryClient.invalidateQueries({queryKey: ["query"]}) },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] })
+    },
   })
 
   const handleDelete = (id: string) => {
