@@ -1,18 +1,13 @@
-export interface NotesDataType {
-  "notes": NoteType[],
-  "totalPages": number
-}
-
-export interface NoteType  {
+export interface Note {
       "id": string,
       "title": string,
       "content": string,
       "createdAt": string,
       "updatedAt": string,
-      "tag": string
+      "tag": "Todo" |"Work"|"Personal"|"Meeting"|"Shopping"
 }
     
-export interface CreateNodeProps{
+export interface CreateNoteProps{
                 title: string,
                 content: string,
                 tag: string,

@@ -1,6 +1,10 @@
 import axios from "axios";
-import type { CreateNodeProps, NotesDataType } from "../types/note";
+import type { CreateNoteProps, Note } from "../types/note";
 
+interface NotesDataType {
+  "notes": Note[],
+  "totalPages": number
+}
 
 axios.defaults.baseURL = "https://notehub-public.goit.study/api";
 axios.defaults.headers.common.Accept = 'application/json';
@@ -11,7 +15,6 @@ export const fetchNotes = async (query: string, page: number):Promise<NotesDataT
     
 const options = {
     params: {
-        search: query,
         ...(query !== "" && {search: query}),
         
         ...(query === "" && {page: page,}),
@@ -28,11 +31,13 @@ const options = {
 
 
 
-export const createNote =async (newNote: CreateNodeProps) => {
-    axios.post('/notes', newNote);
+export const createNote =async (newNote: CreateNoteProps):Promise<Note> => {
+    const response = await axios.post<Note>('/notes', newNote);
+    return response.data;
  };
 
-export const deleteNote =async (noteID: string) => { 
-   await axios.delete(`/notes/${noteID}`);
+export const deleteNote =async (noteID: string):Promise<Note> => { 
+    const response = await axios.delete<Note>(`/notes/${noteID}`);
+     return response.data;
 };
 

@@ -3,35 +3,38 @@ import css from "./NoteForm.module.css";
 import { createNote } from "../../services/noteService";
 import { useMutation, useQueryClient} from '@tanstack/react-query';
 import * as Yup from 'yup';
-import type { CreateNodeProps } from "../../types/note";
+import type { CreateNoteProps } from "../../types/note";
 
 interface NoteFormProps {
-    onChange: (isOpenModal: boolean)=>void,
+    onClose: ()=>void,
 }
 
-const NoteForm = ({ onChange }: NoteFormProps) => {
+const NoteForm = ({ onClose }: NoteFormProps) => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: (newTodo: CreateNodeProps) => createNote(newTodo),
-    onSuccess: () => {queryClient.invalidateQueries({queryKey: ["query"]}) },
+    mutationFn: (newTodo: CreateNoteProps) => createNote(newTodo),
+    onSuccess: () => {
+      onClose();
+      queryClient.invalidateQueries({ queryKey: ["notes"] })
+    },
     onError:(error)=>{console.log("error: ", error);
     },
     
   })
     const handleClick = () => {
-      onChange(false);
+      onClose();
       
     }
 
     const SignupSchema = Yup.object().shape({
    title: Yup.string()
-            .min(2, 'Too Short!')
+            .min(3, 'Too Short!')
             .max(50, 'Too Long!')
             .required('Title is required'),
         content: Yup.string()
-            .min(5, 'Content is too short!')
+          .max(500, 'Too Long!')
             .required('Content is required'),
-        tag: Yup.string().oneOf(["Todo" ,"Work","Personal","Meeting","Shopping"] ).required('Title is required'),
+        tag: Yup.string().oneOf(["Todo" ,"Work","Personal","Meeting","Shopping"] ).required(),
  });
 
     
@@ -46,7 +49,6 @@ const NoteForm = ({ onChange }: NoteFormProps) => {
         validationSchema={SignupSchema}
         onSubmit={(value, actions) => {
           mutation.mutate(value);
-          onChange(false);
           actions.resetForm();
         }}
     >
@@ -54,7 +56,7 @@ const NoteForm = ({ onChange }: NoteFormProps) => {
   <div className={css.formGroup}>
     <label htmlFor="title">Title</label>
     <Field id="title" type="text" name="title" className={css.input} />
-    <ErrorMessage name="title" className={css.error} />
+    <ErrorMessage component="span" name="title" className={css.error} />
   </div>
 
   <div className={css.formGroup}>
@@ -65,7 +67,7 @@ const NoteForm = ({ onChange }: NoteFormProps) => {
       rows={8}
       className={css.textarea}
     />
-    <ErrorMessage name="content" className={css.error} />
+    <ErrorMessage component="span" name="content" className={css.error} />
   </div>
 
   <div className={css.formGroup}>
@@ -77,7 +79,7 @@ const NoteForm = ({ onChange }: NoteFormProps) => {
       <option value="Meeting">Meeting</option>
       <option value="Shopping">Shopping</option>
     </Field>
-    <ErrorMessage name="tag" className={css.error} />
+    <ErrorMessage component="span" name="tag" className={css.error} />
   </div>
 
   <div className={css.actions}>

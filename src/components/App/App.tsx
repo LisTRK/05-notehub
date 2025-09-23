@@ -1,46 +1,32 @@
 import css from './App.module.css'
 import { useState } from 'react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useDebouncedCallback } from 'use-debounce';
 
 import {  fetchNotes } from '../../services/noteService'
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+
 import SearchBox from '../SearchBox/SearchBox';
 import NoteList from '../NoteList/NoteList';
-
 import Pagination from '../Pagination/Pagination';
-import { createPortal } from 'react-dom';
 import Modal from '../Modal/Modal';
-import { useDebouncedCallback } from 'use-debounce';
 import Loader from '../Loader/loader';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
+import NoteForm from '../NoteForm/NoteForm';
 
 
 
 function App() {
-  // const [noteData, setNoteData] = useState<NotesDataType>();
   const [page, setPage] = useState<number>(1);
   const [query, setQuery] = useState<string>("");
   const queryDebounced = useDebouncedCallback(
     (value) => {
+      setPage(1);
       setQuery(value);
     },
-    1000
+    500
   );
-  const [isOpenModal, setIsOpanModal] = useState(false);
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
-  
-  
-  const {
-    data,
-    isError,
-    isLoading,
-    isSuccess,
-  } = useQuery(
-    {
-      queryKey: ["query", {query, page}],
-      queryFn: () => getTodo(query, page),
-      placeholderData: keepPreviousData,
-    },
-    )
   
   const getTodo = async (query: string, page: number) => {
     try {
@@ -52,12 +38,21 @@ function App() {
     
   };
   
-  const handleCreateNote = () => {
-    setIsOpanModal(true);
-  }
-
-  const handleChengeModal = () => {
-    setIsOpanModal(false);
+  const {
+    data,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useQuery(
+    {
+      queryKey: ["notes", query, page],
+      queryFn: () => getTodo(query, page),
+      placeholderData: keepPreviousData,
+    },
+    )
+  
+  const handleOpenModal = () => {
+    setIsOpenModal(!isOpenModal);
   }
  
   return (
@@ -74,14 +69,16 @@ function App() {
             setPage={setPage}
           />}
         {/* Кнопка створення нотатки */}
-        <button onClick={handleCreateNote}  className={css.button}>Create note +</button>
+        <button onClick={handleOpenModal}  className={css.button}>Create note +</button>
       
       </header>
       {isLoading && <Loader />}
       {isError&& <ErrorMessage/>}
       
       {isSuccess && <NoteList notes={data?.notes ?? []} />}
-      {isOpenModal && createPortal(<Modal onChange={handleChengeModal} />, document.getElementById('modal') as HTMLElement)}
+      {isOpenModal && <Modal onClose={handleOpenModal}>
+        <NoteForm onClose={handleOpenModal} />
+      </Modal>}
     </div>
     
   )
