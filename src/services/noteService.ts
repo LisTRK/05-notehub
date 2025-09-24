@@ -16,8 +16,7 @@ export const fetchNotes = async (query: string, page: number):Promise<NotesDataT
 const options = {
     params: {
         ...(query !== "" && {search: query}),
-        
-        ...(query === "" && {page: page,}),
+        page: page,
         perPage: 10,
     }
 };

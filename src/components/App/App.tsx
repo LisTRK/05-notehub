@@ -12,6 +12,7 @@ import Modal from '../Modal/Modal';
 import Loader from '../Loader/loader';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import NoteForm from '../NoteForm/NoteForm';
+import type { Note } from '../../types/note';
 
 
 
@@ -19,7 +20,7 @@ function App() {
   const [page, setPage] = useState<number>(1);
   const [query, setQuery] = useState<string>("");
   const queryDebounced = useDebouncedCallback(
-    (value) => {
+    (value: string) => {
       setPage(1);
       setQuery(value);
     },
@@ -27,13 +28,18 @@ function App() {
   );
   const [isOpenModal, setIsOpenModal] = useState(false);
 
+  interface getTodoPromise{
+    notes: Note[],
+    totalPages:number,
+  }
   
-  const getTodo = async (query: string, page: number) => {
+  const getTodo = async (query: string, page: number): Promise<getTodoPromise> => {
     try {
       const fetchTodo = await fetchNotes(query, page);
       return fetchTodo;
     } catch (error) {
       console.log(error);
+      throw error;
     }
     
   };
@@ -59,15 +65,16 @@ function App() {
     <div className={css.app}>
       <header className={css.toolbar}>
 		{/* Компонент SearchBox */}
-        <SearchBox value={ query} onSearch={queryDebounced} />
+        <SearchBox  onSearch={queryDebounced} />
         
 		{/* Пагінація */}
         {isSuccess &&
           <Pagination
             page={page}
             totalPages={data?.totalPages??1}
-            setPage={setPage}
+          setPage={setPage}
           />}
+        
         {/* Кнопка створення нотатки */}
         <button onClick={handleOpenModal}  className={css.button}>Create note +</button>
       

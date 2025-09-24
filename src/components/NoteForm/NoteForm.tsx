@@ -1,21 +1,25 @@
 import { Field, Form, Formik, ErrorMessage  } from "formik";
-import css from "./NoteForm.module.css";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { createNote } from "../../services/noteService";
-import { useMutation, useQueryClient} from '@tanstack/react-query';
-import * as Yup from 'yup';
 import type { CreateNoteProps } from "../../types/note";
+
+import * as Yup from 'yup';
+import css from "./NoteForm.module.css";
+
 
 interface NoteFormProps {
     onClose: ()=>void,
 }
 
 const NoteForm = ({ onClose }: NoteFormProps) => {
+
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: (newTodo: CreateNoteProps) => createNote(newTodo),
     onSuccess: () => {
-      onClose();
       queryClient.invalidateQueries({ queryKey: ["notes"] })
+      onClose();
     },
     onError:(error)=>{console.log("error: ", error);
     },
@@ -32,8 +36,7 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
             .max(50, 'Too Long!')
             .required('Title is required'),
         content: Yup.string()
-          .max(500, 'Too Long!')
-            .required('Content is required'),
+          .max(500, 'Too Long!'),
         tag: Yup.string().oneOf(["Todo" ,"Work","Personal","Meeting","Shopping"] ).required(),
  });
 
@@ -48,7 +51,7 @@ const NoteForm = ({ onClose }: NoteFormProps) => {
         }
         validationSchema={SignupSchema}
         onSubmit={(value, actions) => {
-          mutation.mutate(value);
+          mutation.mutate(value as CreateNoteProps);
           actions.resetForm();
         }}
     >

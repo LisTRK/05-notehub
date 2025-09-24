@@ -10,6 +10,6 @@ export interface Note {
 export interface CreateNoteProps{
                 title: string,
                 content: string,
-                tag: string,
+                tag: "Todo" |"Work"|"Personal"|"Meeting"|"Shopping"
 }
 
