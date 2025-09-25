@@ -27,9 +27,7 @@ function App() {
     500
   );
 
-  //control modal
   const [isOpenModal, setIsOpenModal] = useState(false);
-  console.log("isOpenModal", isOpenModal);
   
 
   interface getTodoPromise{
@@ -69,10 +67,12 @@ function App() {
     <div className={css.app}>
       <header className={css.toolbar}>
 		{/* Компонент SearchBox */}
-        <SearchBox  onSearch={queryDebounced} />
+        <SearchBox
+          value={query}
+          onSearch={queryDebounced} />
         
 		{/* Пагінація */}
-        {isSuccess &&
+        {isSuccess && data.totalPages > 1 &&
           <Pagination
             page={page}
             totalPages={data?.totalPages??1}
