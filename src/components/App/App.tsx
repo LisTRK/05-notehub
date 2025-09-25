@@ -26,7 +26,11 @@ function App() {
     },
     500
   );
+
+  //control modal
   const [isOpenModal, setIsOpenModal] = useState(false);
+  console.log("isOpenModal", isOpenModal);
+  
 
   interface getTodoPromise{
     notes: Note[],
